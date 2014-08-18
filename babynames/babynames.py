@@ -27,7 +27,7 @@ Here's what the html looks like in the baby.html files:
 ...
 
 Suggested milestones for incremental development:
- -Extract the year and print it
+ -Extract the year and print it (Done)
  -Extract the names and rank numbers and just print them
  -Get the names data into a dict and print it
  -Build the [year, 'name rank', ... ] list and print it
@@ -41,6 +41,11 @@ def extract_names(filename):
   ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
   """
   # +++your code here+++
+  rYear = re.compile(r'Popularity in (\d+)')
+  f = open(filename, 'r')
+  year = re.findall(rYear, f.read())
+  print year
+
   return
 
 
@@ -63,6 +68,9 @@ def main():
   # +++your code here+++
   # For each filename, get the names, then either print the text output
   # or write it to a summary file
+  for filename in args:
+    extract_names(filename)
+   
   
 if __name__ == '__main__':
   main()
