@@ -28,8 +28,8 @@ Here's what the html looks like in the baby.html files:
 
 Suggested milestones for incremental development:
  -Extract the year and print it (Done)
- -Extract the names and rank numbers and just print them
- -Get the names data into a dict and print it
+ -Extract the names and rank numbers and just print them (Done)
+ -Get the names data into a dict and print it (Done)
  -Build the [year, 'name rank', ... ] list and print it
  -Fix main() to use the extract_names list
 """
@@ -41,11 +41,24 @@ def extract_names(filename):
   ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
   """
   # +++your code here+++
-  rYear = re.compile(r'Popularity in (\d+)')
-  f = open(filename, 'r')
-  year = re.findall(rYear, f.read())
-  print year
+  # Names Hashtable
+  rankDb = {}
 
+  rYear = re.compile(r'Popularity in (\d+)')
+  rName = re.compile(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>')
+
+  # Extract the year
+  f = open(filename, 'r')
+  fileStr = f.read()
+  year = re.search(rYear, fileStr)
+  ranks = re.findall(rName, fileStr)
+  print year.group(1)
+  for rank in ranks:
+    rankDb[rank[1]] = rank[0]
+    rankDb[rank[2]] = rank[0]
+  print rankDb   
+  # print fileStr
+  f.close()
   return
 
 
