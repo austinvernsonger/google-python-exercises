@@ -43,6 +43,7 @@ def extract_names(filename):
   # +++your code here+++
   # Names Hashtable
   rankDb = {}
+  rankList = []
 
   rYear = re.compile(r'Popularity in (\d+)')
   rName = re.compile(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>')
@@ -56,7 +57,12 @@ def extract_names(filename):
   for rank in ranks:
     rankDb[rank[1]] = rank[0]
     rankDb[rank[2]] = rank[0]
-  print rankDb   
+
+  
+  def rankHelper(s):
+    return s[0]
+  rankList.append(sorted(rankDb.items(), key=rankHelper))  
+  print rankList   
   # print fileStr
   f.close()
   return
