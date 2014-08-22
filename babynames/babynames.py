@@ -30,8 +30,8 @@ Suggested milestones for incremental development:
  -Extract the year and print it (Done)
  -Extract the names and rank numbers and just print them (Done)
  -Get the names data into a dict and print it (Done)
- -Build the [year, 'name rank', ... ] list and print it
- -Fix main() to use the extract_names list
+ -Build the [year, 'name rank', ... ] list and print it (Done)
+ -Fix main() to use the extract_names list (Done)
 """
 
 def extract_names(filename):
@@ -45,27 +45,39 @@ def extract_names(filename):
   rankDb = {}
   rankList = []
 
-  rYear = re.compile(r'Popularity in (\d+)')
+  # Compile regular expression
+  rYear = re.compile(r'Popularity in (\d\d\d\d)')
   rName = re.compile(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>')
 
   # Extract the year
   f = open(filename, 'r')
   fileStr = f.read()
+
+  # Parse year and name ranks
   year = re.search(rYear, fileStr)
   ranks = re.findall(rName, fileStr)
-  print year.group(1)
+  
+  # Insert ranks into Db
   for rank in ranks:
     rankDb[rank[1]] = rank[0]
     rankDb[rank[2]] = rank[0]
 
-  
   def rankHelper(s):
     return s[0]
-  rankList.append(sorted(rankDb.items(), key=rankHelper))  
-  print rankList   
-  # print fileStr
+
+  # Construct the return year or skip if file isn't the right format
+  if year:
+    rankList.append(year.group(1))
+  else: 
+    print "skipping over %s: Year Not Found" % filename
+    return 
+
+  # Sort and add result list  
+  for k,v in sorted(rankDb.items(), key=rankHelper):
+    rankList.append("%s %s" % (k, v))
+  
   f.close()
-  return
+  return rankList
 
 
 def main():
@@ -88,7 +100,14 @@ def main():
   # For each filename, get the names, then either print the text output
   # or write it to a summary file
   for filename in args:
-    extract_names(filename)
+    result = extract_names(filename)
+    if result:
+      if summary:
+        summaryfile = open('%s.summary' % filename, 'w')
+        summaryfile.write('\n'.join(result) + '\n')
+        summaryfile.close()
+      else:
+        print '\n'.join(result) + '\n'
    
   
 if __name__ == '__main__':
