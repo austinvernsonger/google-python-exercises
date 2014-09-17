@@ -24,8 +24,36 @@ def read_urls(filename):
   extracting the hostname from the filename itself.
   Screens out duplicate urls and returns the urls sorted into
   increasing order."""
-  # +++your code here+++
+
+  # RegEx for extracting hostname and puzzle path
+  rURL = re.compile(r'\S+puzzle')
+  rPath = re.compile(r'\S+/puzzle/\S+')
+
   
+  # Resolve host from filename
+  hostmatch = re.search(r'\S*_([\w.-]+)', filename)
+  if hostmatch:
+    hostname= "http://" + hostmatch.groups()[0]
+    try:
+      ufile= urllib.urlopen(hostname)
+      if(ufile.getcode()!=200):
+        print "Host unreachable: " + ufile.getcode()
+        sys.exit(1)
+    except Exception, e:
+      raise
+  
+  # Parse filename for request to 'puzzle' directory
+  # Sort puzzle files into increasing order and form full URLs  
+  f = open(filename, 'r')
+  puzzleURLs = [] 
+  for line in f: 
+    match= re.search(rPath, line)
+    if match:
+      puzzleURLs.append(match.group())
+  f.close()
+  puzzleURLs= [hostname + p for p in sorted(set(puzzleURLs)) ] 
+  
+  return puzzleURLs
 
 def download_images(img_urls, dest_dir):
   """Given the urls already in the correct order, downloads
