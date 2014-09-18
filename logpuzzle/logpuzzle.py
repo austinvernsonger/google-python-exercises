@@ -17,18 +17,20 @@ Given an apache logfile, find the puzzle urls and download the images.
 Here's what a puzzle url looks like:
 10.254.254.28 - - [06/Aug/2007:00:13:48 -0700] "GET /~foo/puzzle-bar-aaab.jpg HTTP/1.0" 302 528 "-" "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"
 """
-
+def url_sort_key(url):
+  """Some images follow the pattern bar-faab-barr1.jpb 
+    we order on the 2nd word if this is the case """
+  match = re.search(r'-(\w+)-(\w+)\.\w+', url)
+  if match:
+    return match.group(2)
+  else: 
+    return url
 
 def read_urls(filename):
   """Returns a list of the puzzle urls from the given log file,
   extracting the hostname from the filename itself.
   Screens out duplicate urls and returns the urls sorted into
   increasing order."""
-
-  # RegEx for extracting hostname and puzzle path
-  rURL = re.compile(r'\S+puzzle')
-  rPath = re.compile(r'\S+/puzzle/\S+')
-
   
   # Resolve host from filename
   hostmatch = re.search(r'\S*_([\w.-]+)', filename)
@@ -48,12 +50,15 @@ def read_urls(filename):
   f = open(filename, 'r')
   puzzleURLs = [] 
   for line in f: 
-    match= re.search(rPath, line)
+    match= re.search(r'"GET (\S+)', line)
     if match:
-      puzzleURLs.append(match.group())
+      path = match.group(1)
+      if 'puzzle' in path:
+        puzzleURLs.append(path)
   f.close()
-  puzzleURLs= [ hostname + p for p in sorted(set(puzzleURLs)) ]  # behavies like .map(lambda)
+  puzzleURLs= [ hostname + p for p in sorted(set(puzzleURLs), key=url_sort_key) ]  # behavies like .map(lambda)
   
+  print "# of images found:", len(puzzleURLs)
   return puzzleURLs
 
 def download_images(img_urls, dest_dir):
@@ -70,17 +75,19 @@ def download_images(img_urls, dest_dir):
     os.mkdir(dest_dir)
 
   # HTML File
-  f = open(os.path.join(dest_dir, 'index.html'), 'w')
+  path = os.path.join(dest_dir, 'index.html') 
+  f = open(path, 'w')
   f.write("<verbatim><html><body>")
 
-  # Its a reading bunny!
   # Iterate over an enumerate object (index, value)
+  # Write HTML file with image slices
   for i, url in enumerate(img_urls):
     print "Retrieving..." , url  
     urllib.urlretrieve(url, "./%s/img%d" % (dest_dir, i))
     f.write("<img src='img%d'>" % (i))  
   
   f.write("</body></html>")
+  print "View image at", os.path.abspath(path)
   f.close()
   return 
 

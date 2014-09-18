@@ -26,6 +26,7 @@ def main():
 
   # Make a list of command line arguments, omitting the [0] element
   # which is the script itself.
+  # print sys.argv[0]
   args = sys.argv[1:]
   if not args:
     print "usage: [--todir dir][--tozip zipfile] dir [dir ...]";
