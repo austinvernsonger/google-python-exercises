@@ -39,8 +39,9 @@ def read_urls(filename):
       if(ufile.getcode()!=200):
         print "Host unreachable: " + ufile.getcode()
         sys.exit(1)
-    except Exception, e:
-      raise
+    except IOError, e:
+      print e
+      sys.exit(1)
   
   # Parse filename for request to 'puzzle' directory
   # Sort puzzle files into increasing order and form full URLs  
@@ -51,7 +52,7 @@ def read_urls(filename):
     if match:
       puzzleURLs.append(match.group())
   f.close()
-  puzzleURLs= [hostname + p for p in sorted(set(puzzleURLs)) ] 
+  puzzleURLs= [ hostname + p for p in sorted(set(puzzleURLs)) ]  # behavies like .map(lambda)
   
   return puzzleURLs
 
@@ -64,7 +65,24 @@ def download_images(img_urls, dest_dir):
   Creates the directory if necessary.
   """
   # +++your code here+++
+  # Download images into destinaion folder
+  if(not os.path.exists(dest_dir)):
+    os.mkdir(dest_dir)
+
+  # HTML File
+  f = open(os.path.join(dest_dir, 'index.html'), 'w')
+  f.write("<verbatim><html><body>")
+
+  # Its a reading bunny!
+  # Iterate over an enumerate object (index, value)
+  for i, url in enumerate(img_urls):
+    print "Retrieving..." , url  
+    urllib.urlretrieve(url, "./%s/img%d" % (dest_dir, i))
+    f.write("<img src='img%d'>" % (i))  
   
+  f.write("</body></html>")
+  f.close()
+  return 
 
 def main():
   args = sys.argv[1:]
