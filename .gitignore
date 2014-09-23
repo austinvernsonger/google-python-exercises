@@ -9,3 +9,5 @@ copyspecial/yes
 copyspecial/no
 copyspecial/dup
 
+# Logpuzzle Exercise Testing Folders
+logpuzzle/test*/
