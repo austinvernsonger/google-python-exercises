@@ -1,0 +1,11 @@
+# Python Distributions
+.Python
+build/
+
+
+# Copyspecial Exercise Testing Folders
+*.zip
+copyspecial/yes
+copyspecial/no
+copyspecial/dup
+
